@@ -16,7 +16,7 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-app.get('test', async (req, res) => {
+app.get('/test', async (req, res) => {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
