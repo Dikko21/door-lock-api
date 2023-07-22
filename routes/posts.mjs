@@ -45,7 +45,8 @@ router.get("/login/id/:id", async (req, res) => {
     else {
         let currentDay = new Date().getDay()
         let currentHour = new Date().getHours()
-
+        console.log(currentDay)
+        console.log(currentHour)
         if (userData.schedule[0] != currentDay) res.status(401).send({ status: 2 });
         else {
             if (userData.schedule[1] == '1') {
