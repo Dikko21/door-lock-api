@@ -57,7 +57,7 @@ router.get("/login/id/:id", async (req, res) => {
                     }
                     let result = await log.insertOne(newDocument);
                     res.send({ status: 1, ...result }).status(202);
-                } else res.send({ status: 2 }).status(401);
+                } else res.status(401).send({ status: 2 });
             } else {
                 if (currentHour > 11 && currentHour < 17) {
                     let log = await db.collection("log_history");
@@ -67,7 +67,7 @@ router.get("/login/id/:id", async (req, res) => {
                     }
                     let result = await log.insertOne(newDocument);
                     res.send({ status: 1, ...result }).status(202);
-                } else res.send({ status: 2 }).status(401);
+                } else res.status(401).send({ status: 2 });
             }
         }
     }
