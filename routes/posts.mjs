@@ -1,5 +1,7 @@
 import express from "express";
 import db from "../db/conn.mjs";
+import moment from 'moment';
+import 'moment/locale/id';
 
 const router = express.Router();
 
@@ -9,8 +11,8 @@ router.get("/log/id/:id", async (req, res) => {
     let query = { id: req.params.id };
     let userData = await collection.findOne(query);
     let status = 'master'
-    let currentDay = new Date().getDay()
-    let currentHour = new Date().getHours()
+    let currentDay = moment().day()
+    let currentHour = moment().hours()
     if (userData) {
         if (userData.username != 'master') {
             if (userData.schedule[0] == currentDay) {
@@ -43,8 +45,8 @@ router.get("/login/id/:id", async (req, res) => {
     if (!userData) res.status(404).send("Not found");
     else if (userData.username == 'master') res.status(303).send({ status: 0 });
     else {
-        let currentDay = new Date().getDay()
-        let currentHour = new Date().getHours()
+        let currentDay = moment().day()
+        let currentHour = moment().hours()
         console.log(currentDay)
         console.log(currentHour)
         if (userData.schedule[0] != currentDay) res.status(401).send({ status: 2 });
