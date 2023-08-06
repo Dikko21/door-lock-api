@@ -88,4 +88,30 @@ router.get("/createUser/username/:username/id/:id/schedule/:schedule", async (re
 //     res.send(result);
 // });
 
+// Get log history
+router.get("/getLog", async (req, res) => {
+    let collection = await db.collection("log_history");
+    let result = await collection.aggregate([
+        {
+            $lookup: {
+                from: 'user',
+                localField: 'userId',
+                foreignField: 'id',
+                as: 'detail'
+            }
+        }
+    ]).toArray();
+    let data = result.map((x, idx) => {
+        console.log(x)
+        return {
+            no: idx + 1,
+            username: x.detail[0].username,
+            status: x.status,
+            loginDate: moment(x.loginDate).format('dddd, MMMM Do YYYY, h:mm:ss a')
+        }
+    })
+    console.log(data)
+    res.render("home", { variableName: data })
+});
+
 export default router;
