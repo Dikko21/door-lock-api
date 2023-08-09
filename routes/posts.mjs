@@ -1,6 +1,8 @@
 import express from "express";
 import db from "../db/conn.mjs";
+import { GridFSBucket } from "mongodb";
 import moment from 'moment';
+import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -88,6 +90,66 @@ router.get("/createUser/username/:username/id/:id/schedule/:schedule", async (re
 //     res.send(result);
 // });
 
+// Upload image
+router.post("/createUser", async (req, res) => {
+    await upload(req, res);
+    console.log(req.file);
+
+    if (req.file == undefined) {
+        return res.status(400).send({
+            message: "You must select a file.",
+        });
+    }
+
+    let collection = await db.collection("user");
+    let newDocument = { ...req.body, photo: req.file.filename }
+    let result = await collection.insertOne(newDocument);
+    res.send(result);
+});
+
+// Download image
+router.get("/image/:imageName", async (req, res) => {
+    const bucket = new GridFSBucket(db, {
+        bucketName: 'photos',
+    });
+    let downloadStream = bucket.openDownloadStreamByName(req.params.imageName);
+
+    downloadStream.on("data", function (data) {
+        return res.status(200).write(data);
+    });
+
+    downloadStream.on("error", function (err) {
+        return res.status(404).send({ message: "Cannot download the Image!" });
+    });
+
+    downloadStream.on("end", () => {
+        return res.end();
+    });
+});
+
+// const uploadFiles = async (req, res) => {
+//     try {
+//       await upload(req, res);
+//       console.log(req.file);
+
+//       if (req.file == undefined) {
+//         return res.send({
+//           message: "You must select a file.",
+//         });
+//       }
+
+//       return res.send({
+//         message: "File has been uploaded.",
+//       });
+//     } catch (error) {
+//       console.log(error);
+
+//       return res.send({
+//         message: "Error when trying upload image: ${error}",
+//       });
+//     }
+//   };
+
 // Get log history
 router.get("/getLog", async (req, res) => {
     let collection = await db.collection("log_history");
@@ -106,6 +168,8 @@ router.get("/getLog", async (req, res) => {
         return {
             no: idx + 1,
             username: x.detail[0].username,
+            name: x.detail[0].name,
+            photo: x.detail[0].photo,
             status: x.status,
             loginDate: moment(x.loginDate).format('dddd, MMMM Do YYYY, h:mm:ss a')
         }
