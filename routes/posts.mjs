@@ -7,7 +7,7 @@ import upload from "../middleware/upload.js";
 const router = express.Router();
 
 // Logging history
-router.get("/log/id/:id", async (req, res) => {
+router.get("/log/:status/id/:id", async (req, res) => {
     let collection = await db.collection("user");
     let query = { id: req.params.id };
     let userData = await collection.find(query).toArray();
@@ -22,9 +22,9 @@ router.get("/log/id/:id", async (req, res) => {
         else currentSchedule = currentDay + '3'
 
         if (!userData.some(x => x.username == 'master')) {
-            if (userData.some(x => x.schedule == currentSchedule)) status = 'guru jadwal'
-            else status = 'guru pengganti'
-        } else status = 'master'
+            if (userData.some(x => x.schedule == currentSchedule)) status = req.params.status === '0' ? 'guru jadwal (masuk)' : 'guru jadwal (keluar)'
+            else status = req.params.status === '0' ? 'guru pengganti (masuk)' : 'guru pengganti (keluar)'
+        } else status = req.params.status === '0' ? 'master (masuk)' : 'master (keluar)'
     }
 
     let collectionLog = await db.collection("log_history");
@@ -38,7 +38,7 @@ router.get("/log/id/:id", async (req, res) => {
 });
 
 // Checking user permisssion
-router.get("/login/id/:id", async (req, res) => {
+router.get("/login/:status/id/:id", async (req, res) => {
     let collection = await db.collection("user");
     let query = { id: req.params.id };
     let userData = await collection.find(query).toArray();
@@ -58,7 +58,7 @@ router.get("/login/id/:id", async (req, res) => {
             let newDocument = {
                 userId: req.params.id,
                 loginDate: new Date(),
-                status: 'guru jadwal'
+                status: req.params.status === '0' ? 'guru jadwal (masuk)' : 'huru jadwal (keluar)'
             }
             let result = await log.insertOne(newDocument);
             res.status(202).send(result);
@@ -162,9 +162,8 @@ router.get("/getLog", async (req, res) => {
                 as: 'detail'
             }
         }
-    ]).toArray();
+    ]).sort({ _id: -1 }).toArray();
     let data = result.map((x, idx) => {
-        console.log(x)
         return {
             no: idx + 1,
             username: x.detail[0].username,
@@ -174,7 +173,6 @@ router.get("/getLog", async (req, res) => {
             loginDate: moment(x.loginDate).format('dddd, MMMM Do YYYY, h:mm:ss a')
         }
     })
-    console.log(data)
     res.render("home", { variableName: data })
 });
 
