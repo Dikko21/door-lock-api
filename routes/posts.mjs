@@ -24,13 +24,17 @@ router.get("/log/:status/id/:id", async (req, res) => {
         if (!userData.some(x => x.username == 'master')) {
             if (userData.some(x => x.schedule == currentSchedule)) status = req.params.status === '0' ? 'guru jadwal (masuk)' : 'guru jadwal (keluar)'
             else status = req.params.status === '0' ? 'guru pengganti (masuk)' : 'guru pengganti (keluar)'
-        } else status = req.params.status === '0' ? 'master (masuk)' : 'master (keluar)'
+        }
+        else if (userData.some(x => x.username == 'button')) {
+            status = req.params.status === '0' ? 'button (masuk)' : 'button (keluar)'
+        }
+        else status = req.params.status === '0' ? 'master (masuk)' : 'master (keluar)'
     }
 
     let collectionLog = await db.collection("log_history");
     let newDocument = {
         userId: req.params.id,
-        loginDate: new Date(),
+        loginDate: new Date(new Date().valueOf() + (7 * 60 * 60000)),
         status: status
     }
     let result = await collectionLog.insertOne(newDocument);
@@ -57,7 +61,7 @@ router.get("/login/:status/id/:id", async (req, res) => {
             let log = await db.collection("log_history");
             let newDocument = {
                 userId: req.params.id,
-                loginDate: new Date(),
+                loginDate: new Date(new Date().valueOf() + (7 * 60 * 60000)),
                 status: req.params.status === '0' ? 'guru jadwal (masuk)' : 'huru jadwal (keluar)'
             }
             let result = await log.insertOne(newDocument);
@@ -126,29 +130,6 @@ router.get("/image/:imageName", async (req, res) => {
         return res.end();
     });
 });
-
-// const uploadFiles = async (req, res) => {
-//     try {
-//       await upload(req, res);
-//       console.log(req.file);
-
-//       if (req.file == undefined) {
-//         return res.send({
-//           message: "You must select a file.",
-//         });
-//       }
-
-//       return res.send({
-//         message: "File has been uploaded.",
-//       });
-//     } catch (error) {
-//       console.log(error);
-
-//       return res.send({
-//         message: "Error when trying upload image: ${error}",
-//       });
-//     }
-//   };
 
 // Get log history
 router.get("/getLog", async (req, res) => {
