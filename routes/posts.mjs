@@ -21,12 +21,12 @@ router.get("/log/:status/id/:id", async (req, res) => {
         else if (currentHour > 11 && currentHour < 17) currentSchedule = currentDay + '2'
         else currentSchedule = currentDay + '3'
 
-        if (!userData.some(x => x.username == 'master')) {
+        if (userData.some(x => x.username == 'button')) {
+            status = req.params.status === '0' ? 'button (masuk)' : 'button (keluar)'
+        }
+        else if (!userData.some(x => x.username == 'master')) {
             if (userData.some(x => x.schedule == currentSchedule)) status = req.params.status === '0' ? 'guru jadwal (masuk)' : 'guru jadwal (keluar)'
             else status = req.params.status === '0' ? 'guru pengganti (masuk)' : 'guru pengganti (keluar)'
-        }
-        else if (userData.some(x => x.username == 'button')) {
-            status = req.params.status === '0' ? 'button (masuk)' : 'button (keluar)'
         }
         else status = req.params.status === '0' ? 'master (masuk)' : 'master (keluar)'
     }
