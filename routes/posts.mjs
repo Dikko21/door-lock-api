@@ -17,8 +17,8 @@ router.get("/log/:status/id/:id", async (req, res) => {
     let currentSchedule = '00';
 
     if (userData.length > 0) {
-        if (currentHour > 6 && currentHour < 12) currentSchedule = currentDay + '1'
-        else if (currentHour > 11 && currentHour < 17) currentSchedule = currentDay + '2'
+        if (currentHour > -1 && currentHour < 12) currentSchedule = currentDay + '1'
+        else if (currentHour > 11 && currentHour < 24) currentSchedule = currentDay + '2'
         else currentSchedule = currentDay + '3'
 
         if (userData.some(x => x.username == 'button')) {
@@ -53,8 +53,8 @@ router.get("/login/:status/id/:id", async (req, res) => {
     if (userData.length == 0) res.status(404).send("Not found");
     else if (userData.some(x => x.username == 'master')) res.status(303).send({ status: 0 });
     else {
-        if (currentHour > 6 && currentHour < 12) currentSchedule = currentDay + '1'
-        else if (currentHour > 11 && currentHour < 17) currentSchedule = currentDay + '2'
+        if (currentHour > -1 && currentHour < 12) currentSchedule = currentDay + '1'
+        else if (currentHour > 11 && currentHour < 24) currentSchedule = currentDay + '2'
         else currentSchedule = currentDay + '3'
 
         if (userData.some(x => x.schedule == currentSchedule)) {
