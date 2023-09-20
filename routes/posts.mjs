@@ -34,7 +34,8 @@ router.get("/log/:status/id/:id", async (req, res) => {
     let collectionLog = await db.collection("log_history");
     let newDocument = {
         userId: req.params.id,
-        loginDate: new Date(new Date().valueOf() + (7 * 60 * 60000)),
+        loginDate: new Date(),
+        // loginDate: new Date(new Date().valueOf() + (7 * 60 * 60000)),
         status: status
     }
     let result = await collectionLog.insertOne(newDocument);
@@ -56,13 +57,13 @@ router.get("/login/:status/id/:id", async (req, res) => {
         if (currentHour > -1 && currentHour < 12) currentSchedule = currentDay + '1'
         else if (currentHour > 11 && currentHour < 24) currentSchedule = currentDay + '2'
         else currentSchedule = currentDay + '3'
-
         if (userData.some(x => x.schedule == currentSchedule)) {
             let log = await db.collection("log_history");
             let newDocument = {
                 userId: req.params.id,
-                loginDate: new Date(new Date().valueOf() + (7 * 60 * 60000)),
-                status: req.params.status === '0' ? 'guru jadwal (masuk)' : 'huru jadwal (keluar)'
+                loginDate: new Date(),
+                // loginDate: new Date(new Date().valueOf() + (7 * 60 * 60000)),
+                status: req.params.status === '0' ? 'guru jadwal (masuk)' : 'guru jadwal (keluar)'
             }
             let result = await log.insertOne(newDocument);
             res.status(202).send(result);
